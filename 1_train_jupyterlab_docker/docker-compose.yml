@@ -1,0 +1,24 @@
+services:
+  jupyter:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: train_jupyterlab
+    gpus: all                        # GPUを使わない場合はコメントアウト
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - TZ=Asia/Tokyo
+    ports:
+      - "8888:8888"                  # JupyterLab
+      #- "6006:6006"                  # TensorBoard(使用する場合)
+    shm_size: "16g"                  # 共有メモリの調整場所
+    volumes:
+      - ./work:/workspace
+      - ../models:/workspace/models  # モデル格納場所
+      - ../data:/workspace/data      # データ格納場所
+    tty: true
+    # localhost で利用する場合はトークン無し
+    command: >
+      jupyter lab --ip=0.0.0.0 --port=8888 --no-browser
+      --NotebookApp.token='' --NotebookApp.password=''

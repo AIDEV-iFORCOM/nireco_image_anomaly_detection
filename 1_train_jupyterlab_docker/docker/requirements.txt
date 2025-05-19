@@ -1,0 +1,23 @@
+--extra-index-url https://download.pytorch.org/whl/cu121 # CUDA 12.1 wheels (CUDA 12.2 互換)
+
+# -------- Deep Learning Core --------
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0
+
+# -------- Frameworks --------
+lightning==2.2.2               # PyTorch 2.6対応
+anomalib[core,openvino]==2.0.0 # PyTorch 2.6で動作確認
+python-dotenv==1.0.1
+optuna==4.3.0
+# optuna-dashboard	           # ダッシュボードを利用する場合
+
+# -------- Utilities --------
+numpy==1.26.4                  # PyTorch 2.x 系を使う場合 NumPy 1.xが必要
+pybind11>=2.12                 # 将来 NumPy 2 対応用 
+opencv-python-headless
+scikit-learn
+tqdm
+matplotlib
+jupyterlab
+tensorboard>=2.10

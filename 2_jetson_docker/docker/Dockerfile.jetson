@@ -1,0 +1,45 @@
+###############################################################################
+# JetPack 6.2 (L4T r36.4.0) + TensorRT 10.3
+#           +  PyTorch 2.6.0  /  TorchVision 0.21.0  (pre-built wheels)
+###############################################################################
+FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0
+
+ENV DEBIAN_FRONTEND=noninteractive TZ=Asia/Tokyo
+
+# ---------- common build vars ----------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3 python3-pip python3-dev python-is-python3 \
+        libopenblas-dev liblapack-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 uninstall -y torch torchvision torchaudio
+
+# ---------- PyTorch & TorchVision wheels ----------
+# --- Jetson-AI-Lab JP6 / CUDA12.6  ---
+#     * torch-2.6.0 / torchvision-0.21.0 / torchaudio-2.6.0 
+RUN pip3 install --no-cache-dir \
+    #--extra-index-url https://pypi.jetson-ai-lab.dev/jp6/cu126 \
+    --pre --index-url https://pypi.jetson-ai-lab.dev/jp6/cu126 \
+    torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 \
+    --timeout 120 --retries 5
+
+# ---------- TensorRT DLA tools ----------
+#RUN apt-get update && apt-get install -y --no-install-recommends \
+#        nvidia-l4t-jetson-dla-tools && \
+#    rm -rf /var/lib/apt/lists/*
+
+# ---------- extra Python deps ----------
+COPY docker/requirements.txt /tmp/req.txt
+RUN pip3 install --no-cache-dir -r /tmp/req.txt && rm /tmp/req.txt
+
+WORKDIR /workspace   
+
+# ---------- sanity check ----------
+RUN python3 - <<'PY'
+import torch, torchvision, os
+print("torch :", torch.__version__, torch.version.cuda)
+print("tv    :", torchvision.__version__)
+print("arch  :", os.getenv("TORCH_CUDA_ARCH_LIST"))
+PY
+
+CMD ["/bin/bash"]

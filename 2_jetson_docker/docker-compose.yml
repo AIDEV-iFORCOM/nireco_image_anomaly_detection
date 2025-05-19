@@ -1,0 +1,19 @@
+services:
+  jetson_batch:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.jetson
+    container_name: jetson_batch
+    runtime: nvidia
+    group_add:
+      - render
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      #- NVIDIA_DRIVER_CAPABILITIES=all
+      - TZ=Asia/Tokyo
+    shm_size: "6g"                  # メモリ要調整
+    volumes:
+      - ./work:/workspace
+      - ../models:/workspace/models
+      - ../data:/workspace/data
+    tty: true
